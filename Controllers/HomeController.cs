@@ -50,14 +50,7 @@ public class HomeController : Controller
     {
         return View();
     }
-
-
-    [HttpGet("GetProducts")]
-    public ProductPageViewModel GetProducts(string query, int page)
-    {
-        var model = _iProductService.GetProducts(query, page);
-        return model;
-    }
+    
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

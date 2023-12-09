@@ -13,8 +13,8 @@ public class ProductService : IProductService
         var products = _db.Products
             .Include(prod => prod.Category)
             .Where(c => query == null ||
-            c.Name.Contains(query, StringComparison.InvariantCultureIgnoreCase) ||
-            c.Description.Contains(query, StringComparison.InvariantCultureIgnoreCase));
+                c.Name.Contains(query) || c.Description.Contains(query)
+            ).ToList();
         int itemsPerPage = 4;
         int skip = (page - 1) * itemsPerPage;
         var pageProducts = products.Skip(skip).Take(itemsPerPage).ToList();
