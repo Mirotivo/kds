@@ -122,6 +122,7 @@
                     await this.startConnection();
                     this.fetchStationGroups();
                     this.fetchCategories();
+                    this.fetchOrders();
                 },
                 methods: {
                     async startConnection() {
@@ -153,6 +154,16 @@
                             })
                             .catch((error) => {
                                 console.error('Error fetching products:', error);
+                            });
+                    },
+                    fetchOrders() {
+                        fetch('/api/purchaseorders')
+                            .then(response => response.json())
+                            .then(data => {
+                                this.orders = data;
+                            })
+                            .catch(error => {
+                                console.error('Error fetching station groups:', error);
                             });
                     },
                     joinGroup(groupName) {

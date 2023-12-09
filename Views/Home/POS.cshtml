@@ -193,12 +193,31 @@
             Status: "InProgress",
             OrderItems: this.orderItems
           };
-          connection.invoke("NotifyStations", order).catch(function (err) {
-            console.error(err.toString());
-          });
 
-          this.orderItems = [];
-          this.customerName = "";
+          // Make an API POST request to create the purchase order
+          fetch('/api/purchaseorders', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(order),
+          })
+          .then(response => response.json())
+          .then(createdPurchaseOrder => {
+              // Send a notification to stations
+              const selectedStationGroup = this.stationgroups.find(group => group.id === this.stationGroupSelector);
+              createdPurchaseOrder.StationGroup = selectedStationGroup;
+              connection.invoke("NotifyStations", createdPurchaseOrder).catch(function (err) {
+                  console.error(err.toString());
+              });
+
+              // Clear order items and customer name
+              this.orderItems = [];
+              this.customerName = "";
+          })
+          .catch(error => {
+              console.error('Error creating purchase order:', error);
+          });
         },
       },
     });

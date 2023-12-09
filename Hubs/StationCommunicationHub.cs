@@ -9,10 +9,16 @@ public class PurchaseOrderListeners
 
 public class StationCommunicationHub : Hub
 {
+    private readonly IPurchaseOrderService _purchaseOrderService;
+
     private static int ID = 1000;
     private static Dictionary<int, PurchaseOrderListeners> poListeners = new Dictionary<int, PurchaseOrderListeners>();
     private static ConcurrentDictionary<string, HashSet<string>> groupMemberships = new ConcurrentDictionary<string, HashSet<string>>();
 
+    public StationCommunicationHub(IPurchaseOrderService purchaseOrderService)
+    {
+        _purchaseOrderService = purchaseOrderService;
+    }
     public async Task SubscribeStation(string stationGroup)
     {
         // Remove from all groups this connection currently belongs to
@@ -45,8 +51,6 @@ public class StationCommunicationHub : Hub
     }
     public async Task NotifyStations(PurchaseOrder po)
     {
-        if (po.ID <= 0)
-            po.ID = ID++;
         if (po.StationGroup != null && !string.IsNullOrEmpty(po.StationGroup.Name))
         {
             if (poListeners.ContainsKey(po.ID))
@@ -64,6 +68,9 @@ public class StationCommunicationHub : Hub
         {
             await Clients.Others.SendAsync("UpdateStation", po);
         }
+
+        // Update the PurchaseOrder in the database
+        await _purchaseOrderService.UpdatePurchaseOrder(po);
     }
 
 

@@ -7,8 +7,10 @@ string connString = builder.Configuration.GetConnectionString("Sqlite") ?? "";
 builder.Services.AddDbContext<DBContext>(option => option.UseSqlite(connString));
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 builder.Services.AddSignalR();
+builder.Services.AddTransient<IStationGroupService, StationGroupService>();
 builder.Services.AddTransient<ICategoryService, CategoryService>();
 builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<IPurchaseOrderService, PurchaseOrderService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
