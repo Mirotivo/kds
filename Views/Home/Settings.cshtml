@@ -1,6 +1,32 @@
 ﻿@{
-  ViewData["Title"] = "Settings";
+    ViewData["Title"] = "Settings";
 }
+
+<div class="container" id="stationGroupsManager">
+    <h1>Station Groups</h1>
+
+    <!-- Create a form for adding a new station group -->
+    <form v-on:submit.prevent="addStationGroup">
+        <input v-model="newStationGroupName" type="text" placeholder="New Station Group Name" required>
+        <button type="submit">Add Station Group</button>
+    </form>
+
+    <!-- Display a list of station groups -->
+    <ul>
+        <li v-for="stationgroup in stationgroups" :key="stationgroup.id">
+            {{ stationgroup.name }}
+            <button v-on:click="editStationGroup(stationgroup)">Edit</button>
+            <button v-on:click="deleteStationGroup(stationgroup.id)">Delete</button>
+        </li>
+    </ul>
+
+    <!-- Edit station group form -->
+    <div v-if="editingStationGroup">
+        <h2>Edit Station Group</h2>
+        <input v-model="editingStationGroupName" type="text" required>
+        <button v-on:click="updateStationGroup(editingStationGroup.id)">Save</button>
+    </div>
+</div>
 
 <div class="container" id="categoriesManager">
     <h1>Categories</h1>
@@ -30,7 +56,80 @@
 
 @section Scripts {
     <script>
-        new Vue({
+        const stationGroupsManager = new Vue({
+            el: '#stationGroupsManager',
+            data: {
+                stationgroups: [],
+                newStationGroupName: '',
+                editingStationGroup: null,
+                editingStationGroupName: '',
+            },
+            created() {
+                this.fetchStationGroups();
+            },
+            methods: {
+                // Fetch station groups from the API
+                fetchStationGroups() {
+                    fetch('/api/stationgroups')
+                        .then(response => response.json())
+                        .then(data => {
+                            this.stationgroups = data;
+                        });
+                },
+                // Add a new station group
+                addStationGroup() {
+                    fetch('/api/stationgroups', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ name: this.newStationGroupName }),
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            this.stationgroups.push(data);
+                            this.newStationGroupName = '';
+                        });
+                },
+                // Edit a station group
+                editStationGroup(stationgroup) {
+                    this.editingStationGroup = stationgroup;
+                    this.editingStationGroupName = stationgroup.name;
+                },
+                // Update an edited station group
+                updateStationGroup(stationgroupId) {
+                    fetch(`/api/stationgroups/${stationgroupId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ name: this.editingStationGroupName }),
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            const index = this.stationgroups.findIndex(stationgroup => stationgroup.id === stationgroupId);
+                            if (index !== -1) {
+                                this.stationgroups[index] = data;
+                            }
+                            this.editingStationGroup = null;
+                            this.editingStationGroupName = '';
+                        });
+                },
+                // Delete a station group
+                deleteStationGroup(stationgroupId) {
+                    if (confirm('Are you sure you want to delete this station group?')) {
+                        fetch(`/api/stationgroups/${stationgroupId}`, {
+                            method: 'DELETE',
+                        })
+                            .then(() => {
+                                this.stationgroups = this.stationgroups.filter(stationgroup => stationgroup.id !== stationgroupId);
+                            });
+                    }
+                },
+            },
+        });
+
+        const categoriesManager = new Vue({
             el: '#categoriesManager',
             data: {
                 categories: [],

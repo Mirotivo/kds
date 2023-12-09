@@ -47,7 +47,7 @@ public class StationCommunicationHub : Hub
     {
         if (po.ID <= 0)
             po.ID = ID++;
-        if (!string.IsNullOrEmpty(po.StationGroup))
+        if (po.StationGroup != null && !string.IsNullOrEmpty(po.StationGroup.Name))
         {
             if (poListeners.ContainsKey(po.ID))
             {
@@ -58,7 +58,7 @@ public class StationCommunicationHub : Hub
                 poListeners[po.ID] = new PurchaseOrderListeners { PurchaseOrder = po, Listeners = new List<string>() };
             }
             // Send the PO to all stations in the specified section
-            await Clients.Group(po.StationGroup).SendAsync("UpdateStation", po);
+            await Clients.Group(po.StationGroup.Name).SendAsync("UpdateStation", po);
         }
         else
         {

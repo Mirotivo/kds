@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 public class DBContext : DbContext
 {
+    public DbSet<StationGroup> StationGroups { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
