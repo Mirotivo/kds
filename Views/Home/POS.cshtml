@@ -128,8 +128,8 @@
               console.error('Error fetching station groups:', error);
             });
         },
-        searchProducts(page = this.currentPage) {
-          fetch(`/api/products?query=${this.searchQuery}&page=${page}`)
+        searchProducts() {
+          fetch(`/api/products?query=${this.searchQuery}&page=${this.currentPage}`)
             .then((response) => response.json())
             .then((data) => {
               this.products = data.currentPageData;
