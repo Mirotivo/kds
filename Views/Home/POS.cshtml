@@ -207,6 +207,7 @@
               // Send a notification to stations
               const selectedStationGroup = this.stationgroups.find(group => group.id === this.stationGroupSelector);
               createdPurchaseOrder.StationGroup = selectedStationGroup;
+              console.log(createdPurchaseOrder);
               connection.invoke("NotifyStations", createdPurchaseOrder).catch(function (err) {
                   console.error(err.toString());
               });

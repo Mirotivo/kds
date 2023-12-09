@@ -12,7 +12,8 @@ public class PurchaseOrderService : IPurchaseOrderService
     public List<PurchaseOrder> GetPurchaseOrders()
     {
         return _db.PurchaseOrders
-            .Include(po => po.OrderItems).ToList();
+            .Include(po => po.OrderItems)
+            .Include(po => po.StationGroup).ToList();
     }
 
 

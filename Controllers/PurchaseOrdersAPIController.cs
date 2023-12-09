@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using kds.Models;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AutoMapper;
 
 namespace kds.Controllers;
 
@@ -10,10 +11,14 @@ namespace kds.Controllers;
 [ApiController]
 public class PurchaseOrdersAPIController : ControllerBase
 {
+    private readonly IMapper _mapper;
     private readonly IPurchaseOrderService _purchaseOrderService;
 
-    public PurchaseOrdersAPIController(IPurchaseOrderService purchaseOrderService)
+    public PurchaseOrdersAPIController(
+        IMapper mapper,
+        IPurchaseOrderService purchaseOrderService)
     {
+        _mapper = mapper;
         _purchaseOrderService = purchaseOrderService;
     }
 
@@ -21,7 +26,8 @@ public class PurchaseOrdersAPIController : ControllerBase
     public List<PurchaseOrderDto> GetPurchaseOrders()
     {
         var pos = _purchaseOrderService.GetPurchaseOrders();
-        var posDto = pos.Select(po => ObjectMapper.MapToDto<PurchaseOrder, PurchaseOrderDto>(po)).ToList();
+        var posDto = _mapper.Map<List<PurchaseOrderDto>>(pos);
+        // var posDto = pos.Select(po => ObjectMapper.MapToDto<PurchaseOrder, PurchaseOrderDto>(po)).ToList();
         return posDto;
     }
 

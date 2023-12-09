@@ -76,14 +76,25 @@ public class StationCommunicationHub : Hub
 
     public async Task SubscribeClient(int poID)
     {
-        // Register the connection ID for this client and the PO ID they want to track
         var connectionId = Context.ConnectionId;
+
+        // Remove the connection ID from all existing PurchaseOrderListeners
+        foreach (var kvp in poListeners)
+        {
+            PurchaseOrderListeners poListener = kvp.Value;
+            if (poListener.Listeners.Contains(connectionId))
+            {
+                poListener.Listeners.Remove(connectionId);
+            }
+        }
+
+        // Register the connection ID for this client and the PO ID they want to track
         if (poListeners.ContainsKey(poID))
         {
             PurchaseOrderListeners poListener = poListeners[poID];
             poListener.Listeners.Add(connectionId);
 
-            await NotifyClients(poListener.PurchaseOrder);
+            await Clients.Client(connectionId).SendAsync("UpdateClient", poListener.PurchaseOrder);
         }
     }
     public async Task UnsubscribeClient(int poID)

@@ -22,6 +22,7 @@
         });
 
         connection.on("UpdateClient", function (po) {
+            console.log(po);
             var id = po.id;
             var orderStatusValueElement = document.getElementById("orderStatusValue");
             orderStatusValueElement.textContent = po.status;

@@ -112,17 +112,16 @@
                         };
                     },
                     ongoingOrders() {
-                        return this.orders.filter(order => order.status !== 'Completed');
+                        return this.orders.filter(order => order.stationGroup.name === this.stationGroupName && order.status !== 'Completed');
                     },
                     completedOrders() {
-                        return this.orders.filter(order => order.status === 'Completed');
+                        return this.orders.filter(order => order.stationGroup.name === this.stationGroupName && order.status === 'Completed');
                     }
                 },
                 async created() {
                     await this.startConnection();
                     this.fetchStationGroups();
                     this.fetchCategories();
-                    this.fetchOrders();
                 },
                 methods: {
                     async startConnection() {
@@ -172,6 +171,7 @@
                             console.error(err.toString());
                         });
                         this.orders = [];
+                        this.fetchOrders();
                     },
                     completeOrder(order) {
                         order.status = "Completed";
@@ -184,6 +184,7 @@
             });
 
             connection.on("UpdateStation", function (order) {
+                console.log(order);
                 if (order.stationGroup.name == stationManager.stationGroupName) {
                     // Find the index of the existing order in the orders array
                     const existingOrderIndex = stationManager.orders.findIndex(
