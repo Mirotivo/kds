@@ -49,6 +49,12 @@ public class HomeController : Controller
     }
 
 
+    public IActionResult Settings()
+    {
+        return View();
+    }
+
+
 
 
     [HttpGet("GetProducts")]
