@@ -1,0 +1,192 @@
+﻿@{
+    ViewData["Title"] = "Station";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Station</h1>
+
+    <div class="container" id="stationManager">
+
+        <div>
+            <button id="group1Button" v-on:click="joinFirstGroup()">Group 1</button>
+            <button id="group2Button" v-on:click="joinSecondGroup()">Group 2</button>
+        </div>
+        <div>
+            <p id="stationGroupLabel">Current Station Group: <span id="stationGroupValue"></span>{{ stationGroup }}</p>
+        </div>
+
+        <div>
+            <label for="categoryFilter">Filter by Category:</label>
+            <div v-for="category in categories" :key="category.id">
+                <input type="checkbox" v-model="selectedCategories" :value="category.id">
+                <label for="categoryFilter">{{ category.name }}</label>
+            </div>
+        </div>
+
+        <div>
+            <!-- Tabs -->
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link" :class="{ active: currentTab === 'ongoing' }" href="#"
+                        v-on:click="currentTab = 'ongoing'">Ongoing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" :class="{ active: currentTab === 'completed' }" href="#"
+                        v-on:click="currentTab = 'completed'">Completed</a>
+                </li>
+            </ul>
+
+            <!-- Ongoing Orders -->
+            <div v-if="currentTab === 'ongoing'" class="d-flex flex-row flex-wrap">
+                <div class="card" v-for="order in ongoingOrders" :key="order.id"
+                    style="max-width: 18rem; margin-right: 10px;">
+                    <!-- Card content for ongoing orders -->
+                    <div class="card-header">{{ order.Source }} {{ order.id }} {{ order.order }}</div>
+                    <div class="card-body">
+                        <p class="card-text">{{ order.order }}</p>
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center"
+                                v-for="item in filteredOrderItems(order)">
+                                {{ item.title }}
+                                <span class="badge badge-primary badge-pill">{{ item.quantity }}</span>
+                            </li>
+                        </ul>
+                        <button v-on:click="completeOrder(order)" class="btn btn-primary">Complete</button>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
+                    <!-- ... -->
+                </div>
+            </div>
+
+            <!-- Completed Orders -->
+            <div v-if="currentTab === 'completed'" class="d-flex flex-row flex-wrap">
+                <div class="card" v-for="order in completedOrders" :key="order.id"
+                    style="max-width: 18rem; margin-right: 10px;">
+                    <!-- Card content for completed orders -->
+                    <div class="card-header">{{ order.Source }} {{ order.id }} {{ order.order }}</div>
+                    <div class="card-body">
+                        <p class="card-text">{{ order.order }}</p>
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center"
+                                v-for="item in order.orderItems">
+                                {{ item.title }}
+                                <span class="badge badge-primary badge-pill">{{ item.quantity }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
+                    <!-- ... -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const stationManager = new Vue({
+            el: '#stationManager',
+            data: {
+                stationGroup: "group1",
+                currentTab: 'ongoing',
+                orders: [],
+
+                categories: [
+                    { id: 0, name: "Beverages" },
+                    { id: 1, name: "Food" }
+                ],
+                selectedCategories: [],
+            },
+            computed: {
+                filteredOrderItems() {
+                    return (order) => {
+                        if (this.selectedCategories.length === 0) {
+                            return order.orderItems;
+                        } else {
+                            return order.orderItems.filter((item) => this.selectedCategories.includes(item.categoryID));
+                        }
+                    };
+                },
+                ongoingOrders() {
+                    return this.orders.filter(order => order.status !== 'Completed');
+                },
+                completedOrders() {
+                    return this.orders.filter(order => order.status === 'Completed');
+                }
+            },
+            async created() {
+                await this.startConnection();
+                this.joinFirstGroup();
+                this.fetchCategories();
+            },
+            methods: {
+                async startConnection() {
+                    try {
+                        await connection.start();
+                    } catch (error) {
+                        console.error("Error starting SignalR connection:", error);
+                    }
+                },
+                fetchCategories(page = this.currentPage) {
+                    fetch(`/GetCategories`)
+                        .then((response) => response.json())
+                        .then((data) => {
+                            this.categories = data;
+                        })
+                        .catch((error) => {
+                            console.error('Error fetching products:', error);
+                        });
+                },
+                joinFirstGroup() {
+                    this.stationGroup = "group1";
+                    connection.invoke("SubscribeStation", this.stationGroup).catch(function (err) {
+                        console.error(err.toString());
+                    });
+                    this.orders = [];
+                },
+                joinSecondGroup() {
+                    this.stationGroup = "group2";
+                    connection.invoke("SubscribeStation", this.stationGroup).catch(function (err) {
+                        console.error(err.toString());
+                    });
+                    this.orders = [];
+                },
+                completeOrder(order) {
+                    order.status = "Completed";
+                    connection.invoke("NotifyClients", order).catch(function (err) {
+                        return console.error(err.toString());
+                    });
+
+                },
+            },
+        });
+
+        connection.on("UpdateStation", function (order) {
+            if (order.stationGroup == stationManager.stationGroup) {
+                // Find the index of the existing order in the orders array
+                const existingOrderIndex = stationManager.orders.findIndex(
+                    (existingOrder) => existingOrder.id === order.id
+                );
+                if (existingOrderIndex !== -1) {
+                    // If the order already exists, replace it with the updated order
+                    Vue.set(stationManager.orders, existingOrderIndex, order);
+                } else {
+                    // If the order does not exist, add it to the orders array
+                    stationManager.orders.push(order);
+                }
+            }
+        });
+    </script>
+}
+<style>
+    .badge-primary {
+        background-color: #007bff;
+        /* Bootstrap primary color */
+        color: #fff;
+        /* White text */
+    }
+</style>
