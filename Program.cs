@@ -13,6 +13,13 @@ builder.Services.AddTransient<IProductService, ProductService>();
 builder.Services.AddTransient<IPurchaseOrderService, PurchaseOrderService>();
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<DBContext>();
+    DbInitializer.Initialize(dbContext);
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
