@@ -60,26 +60,7 @@ public class PurchaseOrdersAPIController : ControllerBase
 
         _purchaseOrderService.CreatePurchaseOrder(purchaseOrder);
 
-        var createdPurchaseOrderDto = new PurchaseOrderDto
-        {
-            ID = purchaseOrder.ID,
-            CustomerName = purchaseOrder.CustomerName,
-            StationGroupID = purchaseOrder.StationGroupID,
-            Status = purchaseOrder.Status,
-            Timestamp = purchaseOrder.Timestamp,
-            Source = purchaseOrder.Source,
-            OrderItems = purchaseOrder.OrderItems
-                .Select(orderItem => new OrderItemDto
-                {
-                    Title = orderItem.Title,
-                    Description = orderItem.Description,
-                    Price = orderItem.Price,
-                    Quantity = orderItem.Quantity,
-                    CategoryID = orderItem.CategoryID
-                })
-                .ToList()
-        };
-
+        var createdPurchaseOrderDto = _mapper.Map<PurchaseOrderDto>(purchaseOrder);
         return Ok(createdPurchaseOrderDto);
     }
 }

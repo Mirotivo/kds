@@ -10,8 +10,6 @@ public class PurchaseOrderListeners
 public class StationCommunicationHub : Hub
 {
     private readonly IPurchaseOrderService _purchaseOrderService;
-
-    private static int ID = 1000;
     private static Dictionary<int, PurchaseOrderListeners> poListeners = new Dictionary<int, PurchaseOrderListeners>();
     private static ConcurrentDictionary<string, HashSet<string>> groupMemberships = new ConcurrentDictionary<string, HashSet<string>>();
 

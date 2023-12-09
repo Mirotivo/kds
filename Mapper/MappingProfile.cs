@@ -7,5 +7,9 @@ public class MappingProfile : Profile
         CreateMap<OrderItem, OrderItemDto>();
         CreateMap<PurchaseOrder, PurchaseOrderDto>();
         CreateMap<StationGroup, StationGroupDto>();
+
+        CreateMap<OrderItemDto, OrderItem>();
+        CreateMap<PurchaseOrderDto, PurchaseOrder>();
+        CreateMap<StationGroupDto, StationGroup>();
     }
 }
