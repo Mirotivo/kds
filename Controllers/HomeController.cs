@@ -30,18 +30,15 @@ public class HomeController : Controller
         return View();
     }
 
-    
     public IActionResult POS()
     {
         return View();
     }
 
-
     public IActionResult Station()
     {
         return View();
     }
-
 
     public IActionResult Client()
     {
@@ -55,19 +52,10 @@ public class HomeController : Controller
     }
 
 
-
-
     [HttpGet("GetProducts")]
     public ProductPageViewModel GetProducts(string query, int page)
     {
         var model = _iProductService.GetProducts(query, page);
-        return model;
-    }
-
-    [HttpGet("GetCategories")]
-    public List<Category> GetCategories()
-    {
-        var model = _iCategoryService.GetCategories();
         return model;
     }
 

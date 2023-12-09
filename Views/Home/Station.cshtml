@@ -95,10 +95,7 @@
                 currentTab: 'ongoing',
                 orders: [],
 
-                categories: [
-                    { id: 0, name: "Beverages" },
-                    { id: 1, name: "Food" }
-                ],
+                categories: [],
                 selectedCategories: [],
             },
             computed: {
@@ -131,10 +128,10 @@
                         console.error("Error starting SignalR connection:", error);
                     }
                 },
-                fetchCategories(page = this.currentPage) {
-                    fetch(`/GetCategories`)
-                        .then((response) => response.json())
-                        .then((data) => {
+                fetchCategories() {
+                    fetch('/api/categories')
+                        .then(response => response.json())
+                        .then(data => {
                             this.categories = data;
                         })
                         .catch((error) => {
