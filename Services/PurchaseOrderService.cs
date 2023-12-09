@@ -8,7 +8,7 @@ public class PurchaseOrderService : IPurchaseOrderService
     {
         _db = db;
     }
-    
+
     public List<PurchaseOrder> GetPurchaseOrders()
     {
         return _db.PurchaseOrders
@@ -23,13 +23,12 @@ public class PurchaseOrderService : IPurchaseOrderService
         _db.PurchaseOrders.Add(purchaseOrder);
         try
         {
-            // Save changes to the database
             _db.SaveChanges();
             return purchaseOrder;
         }
         catch (DbUpdateException ex)
         {
-            throw ex; // Log it
+            throw; // Log it
         }
     }
 
@@ -51,16 +50,14 @@ public class PurchaseOrderService : IPurchaseOrderService
             existingPurchaseOrder.Status = purchaseOrder.Status;
             existingPurchaseOrder.Timestamp = purchaseOrder.Timestamp;
 
-            // Update related OrderItems (if applicable)
+            // Update related OrderItems ???
 
-            // Save changes to persist the updates to the database
             await _db.SaveChangesAsync();
             return existingPurchaseOrder;
         }
         catch (Exception ex)
         {
-            // Handle exceptions and log them as needed
-            throw ex;
+            throw; // Log it
         }
     }
 }

@@ -81,147 +81,146 @@
 </div>
 
 @section Scripts {
-  <script>
-    connection.start().then(function () {
-        // Connection to the hub is established
-    });
+    <script>
+      connection.start().then(function () {
+          // Connection to the hub is established
+      });
 
-    const posManager = new Vue({
-      el: '#posManager',
-      data: {
-        // Products Search
-        searchQuery: '',
-        products: [],
-        currentPage: 1,
-        itemsPerPage: 4,
-        totalPages: 1,
+      const posManager = new Vue({
+        el: '#posManager',
+        data: {
+          // Products Search
+          searchQuery: '',
+          products: [],
+          currentPage: 1,
+          itemsPerPage: 4,
+          totalPages: 1,
 
-        // POS
-        orderItems: [],
-        customerName: "",
-        stationGroupSelector: "",
+          // POS
+          orderItems: [],
+          customerName: "",
+          stationGroupSelector: "",
 
-        stationgroups: []
-      },
-      computed: {
-        totalPrice() {
-          return this.orderItems.reduce((total, item) => {
-            return total + item.price * item.quantity;
-          }, 0);
+          stationgroups: []
         },
-      },
-      created() {
-        this.fetchStationGroups();
-        this.searchProducts();
-      },
-      methods: {
-        fetchStationGroups() {
-          fetch('/api/stationgroups')
-            .then(response => response.json())
-            .then(data => {
-              this.stationgroups = data;
-              if (this.stationgroups.length > 0) {
-                this.stationGroupSelector = this.stationgroups[0].id;
+        computed: {
+          totalPrice() {
+            return this.orderItems.reduce((total, item) => {
+              return total + item.price * item.quantity;
+            }, 0);
+          },
+        },
+        created() {
+          this.fetchStationGroups();
+          this.searchProducts();
+        },
+        methods: {
+          fetchStationGroups() {
+            fetch('/api/stationgroups')
+              .then(response => response.json())
+              .then(data => {
+                this.stationgroups = data;
+                if (this.stationgroups.length > 0) {
+                  this.stationGroupSelector = this.stationgroups[0].id;
+                }
+              })
+              .catch(error => {
+                console.error('Error fetching station groups:', error);
+              });
+          },
+          searchProducts() {
+            fetch(`/api/products?query=${this.searchQuery}&page=${this.currentPage}`)
+              .then((response) => response.json())
+              .then((data) => {
+                this.products = data.currentPageData;
+                this.currentPage = data.currentPage;
+                this.totalPages = data.totalPages;
+              })
+              .catch((error) => {
+                console.error('Error fetching products:', error);
+              });
+          },
+          changePage(pageIndex) {
+            this.currentPage = pageIndex;
+            this.searchProducts(pageIndex);
+          },
+
+          addProductToOrder(product) {
+            const existingItem = this.orderItems.find(item => item.title === product.title);
+            if (existingItem) {
+              existingItem.quantity++;
+            } else {
+              const orderItem = {
+                categoryId: product.category.id,
+                title: product.title,
+                description: product.description,
+                price: product.price,
+                quantity: 1
+              };
+              this.orderItems.push(orderItem);
+            }
+          },
+          decreaseQuantity(index) {
+            if (this.orderItems[index].quantity > 0) {
+              this.orderItems[index].quantity--;
+
+              if (this.orderItems[index].quantity === 0) {
+                this.deleteItem(index);
               }
+            }
+          },
+          increaseQuantity(index) {
+            this.orderItems[index].quantity++;
+          },
+          deleteItem(index) {
+            this.orderItems.splice(index, 1);
+          },
+          clearItems() {
+            this.orderItems = [];
+          },
+
+
+
+
+          submitOrder() {
+            const selectedStationGroup = this.stationgroups.find(group => group.id === this.stationGroupSelector);
+            const order = {
+              Source: "POS",
+              CustomerName: this.customerName,
+              StationGroup: selectedStationGroup,
+              StationGroupID: this.stationGroupSelector,
+              Timestamp: new Date(),
+              Status: "InProgress",
+              OrderItems: this.orderItems
+            };
+
+            fetch('/api/purchaseorders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(order),
+            })
+            .then(response => response.json())
+            .then(createdPurchaseOrder => {
+                // Send a notification to stations
+                const selectedStationGroup = this.stationgroups.find(group => group.id === this.stationGroupSelector);
+                createdPurchaseOrder.StationGroup = selectedStationGroup;
+                console.log(createdPurchaseOrder);
+                connection.invoke("NotifyStations", createdPurchaseOrder).catch(function (err) {
+                    console.error(err.toString());
+                });
+
+                // Clear order items and customer name
+                this.orderItems = [];
+                this.customerName = "";
             })
             .catch(error => {
-              console.error('Error fetching station groups:', error);
+                console.error('Error creating purchase order:', error);
             });
+          },
         },
-        searchProducts() {
-          fetch(`/api/products?query=${this.searchQuery}&page=${this.currentPage}`)
-            .then((response) => response.json())
-            .then((data) => {
-              this.products = data.currentPageData;
-              this.currentPage = data.currentPage;
-              this.totalPages = data.totalPages;
-            })
-            .catch((error) => {
-              console.error('Error fetching products:', error);
-            });
-        },
-        changePage(pageIndex) {
-          this.currentPage = pageIndex;
-          this.searchProducts(pageIndex);
-        },
-
-        addProductToOrder(product) {
-          const existingItem = this.orderItems.find(item => item.title === product.title);
-          if (existingItem) {
-            existingItem.quantity++;
-          } else {
-            const orderItem = {
-              categoryId: product.category.id,
-              title: product.title,
-              description: product.description,
-              price: product.price,
-              quantity: 1
-            };
-            this.orderItems.push(orderItem);
-          }
-        },
-        decreaseQuantity(index) {
-          if (this.orderItems[index].quantity > 0) {
-            this.orderItems[index].quantity--;
-
-            if (this.orderItems[index].quantity === 0) {
-              this.deleteItem(index);
-            }
-          }
-        },
-        increaseQuantity(index) {
-          this.orderItems[index].quantity++;
-        },
-        deleteItem(index) {
-          this.orderItems.splice(index, 1);
-        },
-        clearItems() {
-          this.orderItems = [];
-        },
-
-
-
-
-        submitOrder() {
-          const selectedStationGroup = this.stationgroups.find(group => group.id === this.stationGroupSelector);
-          const order = {
-            Source: "POS",
-            CustomerName: this.customerName,
-            StationGroup: selectedStationGroup,
-            StationGroupID: this.stationGroupSelector,
-            Timestamp: new Date(),
-            Status: "InProgress",
-            OrderItems: this.orderItems
-          };
-
-          // Make an API POST request to create the purchase order
-          fetch('/api/purchaseorders', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(order),
-          })
-          .then(response => response.json())
-          .then(createdPurchaseOrder => {
-              // Send a notification to stations
-              const selectedStationGroup = this.stationgroups.find(group => group.id === this.stationGroupSelector);
-              createdPurchaseOrder.StationGroup = selectedStationGroup;
-              console.log(createdPurchaseOrder);
-              connection.invoke("NotifyStations", createdPurchaseOrder).catch(function (err) {
-                  console.error(err.toString());
-              });
-
-              // Clear order items and customer name
-              this.orderItems = [];
-              this.customerName = "";
-          })
-          .catch(error => {
-              console.error('Error creating purchase order:', error);
-          });
-        },
-      },
-    });
-  </script>
-  <script src="~/app/pos.js"></script>
+      });
+    </script>
+    <script src="~/app/pos.js"></script>
 }

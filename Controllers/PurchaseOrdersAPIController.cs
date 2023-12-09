@@ -39,7 +39,6 @@ public class PurchaseOrdersAPIController : ControllerBase
             return BadRequest("Invalid purchase order data");
         }
 
-        // Map the PurchaseOrderDto to your PurchaseOrder entity
         var purchaseOrder = new PurchaseOrder
         {
             CustomerName = purchaseOrderDto.CustomerName,
@@ -59,10 +58,8 @@ public class PurchaseOrdersAPIController : ControllerBase
                 .ToList()
         };
 
-        // Save the purchase order to the database using Entity Framework Core
         _purchaseOrderService.CreatePurchaseOrder(purchaseOrder);
 
-        // You can return the created purchase order or an appropriate success message
         var createdPurchaseOrderDto = new PurchaseOrderDto
         {
             ID = purchaseOrder.ID,

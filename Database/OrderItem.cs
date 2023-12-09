@@ -1,7 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class OrderItem {
+public class OrderItem
+{
     [Key]
     public int ID { get; set; }
     [Required]

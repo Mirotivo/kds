@@ -6,6 +6,6 @@ public static class DbInitializer
 
         StationGroupSeeder.Seed(context);
         CategorySeeder.Seed(context);
-        ProductSeeder.Seed(context);        
+        ProductSeeder.Seed(context);
     }
 }

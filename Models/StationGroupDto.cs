@@ -1,7 +1,7 @@
 public class StationGroupDto
 {
-    [MapsTo("ID")]  
+    [MapsTo("ID")]
     public int ID { get; set; }
-    [MapsTo("Name")]  
+    [MapsTo("Name")]
     public string Name { get; set; }
 }

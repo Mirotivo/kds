@@ -1,13 +1,13 @@
 public class OrderItemDto
 {
-    [MapsTo("CategoryID")]  
+    [MapsTo("CategoryID")]
     public int CategoryID { get; set; }
-    [MapsTo("Title")]  
+    [MapsTo("Title")]
     public string Title { get; set; }
-    [MapsTo("Description")]  
+    [MapsTo("Description")]
     public string Description { get; set; }
-    [MapsTo("Price")]  
+    [MapsTo("Price")]
     public decimal Price { get; set; }
-    [MapsTo("Quantity")]  
+    [MapsTo("Quantity")]
     public int Quantity { get; set; }
 }
