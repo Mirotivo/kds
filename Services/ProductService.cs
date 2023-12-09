@@ -1,14 +1,20 @@
+using Microsoft.EntityFrameworkCore;
+
 public class ProductService : IProductService
 {
-    private readonly DB _db;
+    private readonly DBContext _db;
 
-    public ProductService()
+    public ProductService(DBContext db)
     {
-        _db = new DB();
+        _db = db;
     }
     public ProductPageViewModel GetProducts(string query, int page)
     {
-        var products = _db.ListProducts(query);
+        var products = _db.Products
+            .Include(prod => prod.Category)
+            .Where(c => query == null ||
+            c.Name.Contains(query, StringComparison.InvariantCultureIgnoreCase) ||
+            c.Description.Contains(query, StringComparison.InvariantCultureIgnoreCase));
         int itemsPerPage = 4;
         int skip = (page - 1) * itemsPerPage;
         var pageProducts = products.Skip(skip).Take(itemsPerPage).ToList();
