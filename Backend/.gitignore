@@ -1,4 +1,15 @@
-# Secrets
+# Database
+# SQLite database files
+Database/*.sqlite
+# SQLite database journal files
+Database/*-wal
+# SQLite database lock files
+Database/*.lock
+# SQLite auto-generated metadata files
+Database/*.sqlite-shm
+Database/*.sqlite-wal
+
+# Server Secrets
 ssl/
 kds.pem
 
