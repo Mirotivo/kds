@@ -5,13 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (web)",
+            "name": ".NET Core Launch (Backend)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/net8.0/kds.dll",
+            "preLaunchTask": "build backend",
+            "program": "${workspaceFolder}/Backend/bin/Debug/net8.0/kds.Backend.dll",
             "args": [],
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/Backend",
             "stopAtEntry": false,
             "serverReadyAction": {
                 "action": "openExternally",
@@ -23,6 +23,37 @@
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
             }
+        },
+        {
+            "name": ".NET Core Launch (Frontend)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build frontend",
+            "program": "${workspaceFolder}/Frontend/bin/Debug/net8.0/kds.Frontend.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Frontend",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
         }
-    ]
+    ],
+    "compounds": [
+        {
+          "name": "Backend and Frontend",
+          "configurations": [".NET Core Launch (Backend)", ".NET Core Launch (Frontend)"]
+        }
+      ]
 }

@@ -1,0 +1,23 @@
+@server=localhost:9000
+# @server=92.205.162.126
+
+
+###
+# {"Email":"example@gmail.com","Password":"myP@ssword","ConfirmPassword":"myP@ssword"}
+# {"Email":"amr.mostafa@live.com","Password":"12345678","ConfirmPassword":"12345678"}
+# body2002619@gmail.com
+
+POST https://{{server}}/user/register HTTP/1.1
+Host: {{server}}
+Content-Type: application/json
+Content-Length: 86
+
+{"Email":"amr.mostafa@live.com","Password":"12345678","ConfirmPassword":"12345678"}
+
+###
+POST https://{{server}}/user/login HTTP/1.1
+Host: {{server}}
+Content-Type: application/json
+
+{"Email":"example@gmail.com","Password":"myP@ssword"}
+
