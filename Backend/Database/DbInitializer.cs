@@ -4,8 +4,6 @@ public static class DbInitializer
     {
         context.Database.EnsureCreated();
 
-        Console.WriteLine($"SQLite Database: Seeding ...");
-
         StationGroupSeeder.Seed(context);
         CategorySeeder.Seed(context);
         ProductSeeder.Seed(context);
