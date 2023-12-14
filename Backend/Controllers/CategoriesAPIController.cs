@@ -6,11 +6,11 @@ namespace kds.Controllers;
 
 [Route("api/categories")]
 [ApiController]
-public class CategoriesApiController : ControllerBase
+public class CategoriesAPIController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
 
-    public CategoriesApiController(ICategoryService categoryService)
+    public CategoriesAPIController(ICategoryService categoryService)
     {
         _categoryService = categoryService;
     }

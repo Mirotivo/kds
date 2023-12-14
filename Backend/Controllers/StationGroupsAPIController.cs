@@ -6,11 +6,11 @@ namespace kds.Controllers;
 
 [Route("api/stationgroups")]
 [ApiController]
-public class StationGroupsApiController : ControllerBase
+public class StationGroupsAPIController : ControllerBase
 {
     private readonly IStationGroupService _stationGroupService;
 
-    public StationGroupsApiController(IStationGroupService stationGroupService)
+    public StationGroupsAPIController(IStationGroupService stationGroupService)
     {
         _stationGroupService = stationGroupService;
     }

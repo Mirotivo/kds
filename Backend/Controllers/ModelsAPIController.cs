@@ -14,15 +14,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
 
+[Route("api/models")]
 [ApiController]
-[Route("[controller]/[action]")]
-public class ModelController : ControllerBase
+public class ModelsAPIController : ControllerBase
 {
 
-    private readonly ILogger<ModelController> _logger;
+    private readonly ILogger<ModelsAPIController> _logger;
     private readonly IHostEnvironment _hostingEnvironment;
 
-    public ModelController(ILogger<ModelController> logger, IHostEnvironment hostingEnvironment)
+    public ModelsAPIController(ILogger<ModelsAPIController> logger, IHostEnvironment hostingEnvironment)
     {
         _logger = logger;
         _hostingEnvironment = hostingEnvironment;
@@ -73,7 +73,7 @@ public class ModelController : ControllerBase
     }
 
 
-    [HttpPost(Name = "mnist")]
+    [HttpPost("mnist")]
     public async Task<IActionResult> mnist()
     {
         // check if the request contains a file
