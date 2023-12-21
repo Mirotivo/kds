@@ -10,6 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
 using System;
+using MediatR;
+using System.Reflection;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,9 +34,11 @@ builder.Services.AddSingleton<Dictionary<string, string>>(new Dictionary<string,
 string connString = builder.Configuration.GetConnectionString("Sqlite") ?? "";
 builder.Services.AddDbContext<kdsDbContext>(option => option.UseSqlite(connString));
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 builder.Services.AddTransient<IStationGroupService, StationGroupService>();
 builder.Services.AddTransient<ICategoryService, CategoryService>();
 builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<IProductRepository, ProductRepository>();
 builder.Services.AddTransient<IPurchaseOrderService, PurchaseOrderService>();
 builder.Services
         .AddAuthentication(options =>
