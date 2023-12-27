@@ -191,7 +191,8 @@
               StationGroupID: this.stationGroupSelector,
               Timestamp: new Date(),
               Status: "InProgress",
-              OrderItems: this.orderItems
+              OrderItems: this.orderItems,
+              Notes: null
             };
 
             fetch('https://localhost:9000/api/purchaseorders', {

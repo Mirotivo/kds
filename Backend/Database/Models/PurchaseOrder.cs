@@ -16,4 +16,5 @@ public class PurchaseOrder
     public List<OrderItem> OrderItems { get; set; }
     [ForeignKey("StationGroupID")]
     public StationGroup StationGroup { get; set; }
+    public string? Notes { get; set; }
 }

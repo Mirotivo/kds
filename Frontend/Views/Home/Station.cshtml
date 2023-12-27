@@ -29,8 +29,8 @@
                 <!-- Tabs -->
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
-                        <a class="nav-link" :class="{ active: currentTab === 'ongoing' }" href="#"
-                            v-on:click="currentTab = 'ongoing'">Ongoing</a>
+                        <a class="nav-link" :class="{ active: currentTab === 'current' }" href="#"
+                            v-on:click="currentTab = 'current'">Current Orders</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" :class="{ active: currentTab === 'completed' }" href="#"
@@ -38,25 +38,32 @@
                     </li>
                 </ul>
 
-                <!-- Ongoing Orders -->
-                <div v-if="currentTab === 'ongoing'" class="d-flex flex-row flex-wrap">
-                    <div class="card" v-for="order in ongoingOrders" :key="order.id"
+                <!-- Current Orders -->
+                <div v-if="currentTab === 'current'" class="d-flex flex-row flex-wrap">
+                    <div class="card" v-for="order in currentOrders" :key="order.id"
                         style="max-width: 18rem; margin-right: 10px;">
-                        <!-- Card content for ongoing orders -->
-                        <div class="card-header">{{ order.Source }} {{ order.id }} {{ order.order }}</div>
+                        <!-- Card content for current orders -->
+                        <div class="card-header" v-bind:class="{'preparing': order.status === 'Preparing'}">Order No.: {{ order.Source }} {{ order.id }} {{ order.order }}</div>
                         <div class="card-body">
                             <p class="card-text">{{ order.order }}</p>
                             <ul class="list-group">
                                 <li class="list-group-item d-flex justify-content-between align-items-center"
                                     v-for="item in filteredOrderItems(order)">
                                     {{ item.title }}
+                                    <span >   </span>
                                     <span class="badge badge-primary badge-pill">{{ item.quantity }}</span>
                                 </li>
                             </ul>
+                            <span>Special Req:</span>
+                            <span>
+                                {{order.notes}}
+                            </span>
+                            <br />
+                            <button v-on:click="prepareOrder(order)" class="btn btn-success">Prepare</button>
                             <button v-on:click="completeOrder(order)" class="btn btn-primary">Complete</button>
                         </div>
                         <div class="card-footer">
-                            <small class="text-muted">Last updated 3 mins ago</small>
+                            <small class="text-muted">Last updated {{ 3 }} mins ago</small>
                         </div>
                         <!-- ... -->
                     </div>
@@ -67,7 +74,7 @@
                     <div class="card" v-for="order in completedOrders" :key="order.id"
                         style="max-width: 18rem; margin-right: 10px;">
                         <!-- Card content for completed orders -->
-                        <div class="card-header">{{ order.Source }} {{ order.id }} {{ order.order }}</div>
+                        <div class="card-header">Order No.: {{ order.Source }} {{ order.id }} {{ order.order }}</div>
                         <div class="card-body">
                             <p class="card-text">{{ order.order }}</p>
                             <ul class="list-group">
@@ -79,7 +86,7 @@
                             </ul>
                         </div>
                         <div class="card-footer">
-                            <small class="text-muted">Last updated 3 mins ago</small>
+                            <small class="text-muted">Last updated {{ 3 }} mins ago</small>
                         </div>
                         <!-- ... -->
                     </div>
@@ -95,7 +102,7 @@
                 data: {
                     stationgroups: [],
                     stationGroupName: "",
-                    currentTab: 'ongoing',
+                    currentTab: 'current',
                     orders: [],
 
                     categories: [],
@@ -111,7 +118,7 @@
                             }
                         };
                     },
-                    ongoingOrders() {
+                    currentOrders() {
                         return this.orders.filter(order => order.stationGroup.name === this.stationGroupName && order.status !== 'Completed');
                     },
                     completedOrders() {
@@ -173,12 +180,17 @@
                         this.orders = [];
                         this.fetchOrders();
                     },
+                    prepareOrder(order) {
+                        order.status = "Preparing";
+                        connection.invoke("NotifyClients", order).catch(function (err) {
+                            return console.error(err.toString());
+                        });
+                    },
                     completeOrder(order) {
                         order.status = "Completed";
                         connection.invoke("NotifyClients", order).catch(function (err) {
                             return console.error(err.toString());
                         });
-
                     },
                 },
             });
@@ -207,5 +219,9 @@
             /* Bootstrap primary color */
             color: #fff;
             /* White text */
+        }
+
+        .preparing {
+            background-color: #198754;
         }
     </style>

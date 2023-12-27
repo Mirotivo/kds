@@ -16,4 +16,6 @@ public class PurchaseOrderDto
     public List<OrderItemDto> OrderItems { get; set; }
     [MapsTo("StationGroup")]
     public StationGroupDto StationGroup { get; set; }
+    [MapsTo("Notes")]
+    public string? Notes { get; set; }
 }
