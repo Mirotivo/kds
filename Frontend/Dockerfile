@@ -15,5 +15,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /kds-frontend
 COPY --from=build /kds-frontend/out .
 
+# Copy the SSL folder from the host to the container
+COPY ./ssl /kds-frontend/ssl
+
 # Start the application
 ENTRYPOINT ["dotnet", "kds.Frontend.dll"]
