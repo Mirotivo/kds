@@ -1,20 +1,20 @@
 version: '3'
 services:
-  kds-backend-container:
+  backend-container:
     build:
       context: ./Backend
     ports:
       - "9000:443"
     volumes:
       - ${PWD}/Database:/kds-backend/Database
-    container_name: kds-backend-container
+    container_name: backend-container
 
-  kds-frontend-container:
+  frontend-container:
     depends_on:
-      - kds-backend-container
+      - backend-container
     build:
       context: ./Frontend
     ports:
       - "8080:80"
       - "8000:443"
-    container_name: kds-frontend-container
+    container_name: frontend-container
