@@ -7,5 +7,7 @@ public static class DbInitializer
         StationGroupSeeder.Seed(context);
         CategorySeeder.Seed(context);
         ProductSeeder.Seed(context);
+        UserSeeder.Seed(context);
+        FriendshipSeeder.Seed(context);
     }
 }

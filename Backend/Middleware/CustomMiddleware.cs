@@ -8,25 +8,22 @@ public class CustomMiddleware : IMiddleware
         // Check if the attribute is present on the current action
         if (context.GetEndpoint()?.Metadata.GetMetadata<MyCustomAttribute>() != null)
         {
-            // // Set custom value in the HttpContext
-            // context.Items["URL"] = context.Request.Path;
+            // Only in Connected
+            if (context.Request.Path.Equals("/webrtc", StringComparison.OrdinalIgnoreCase))
+            {
+                var jwtToken = context.Request.Query["access_token"].ToString();
+                if (!string.IsNullOrEmpty(jwtToken))
+                {
+                    context.Request.Headers["Authorization"] = $"Bearer {jwtToken}";
+                    var jwtHandler = new JwtSecurityTokenHandler();
+                    var token = jwtHandler.ReadJwtToken(jwtToken.Trim('"'));
 
-            // // TODO: Add your middleware logic here.
-            // var jwtToken = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-
-            // var jwtToken = context.Request.Query["access_token"].ToString();
-            // if (!string.IsNullOrEmpty(jwtToken))
-            // {
-            //     context.Request.Headers["Authorization"] = $"Bearer {jwtToken}";
-            //     var jwtHandler = new JwtSecurityTokenHandler();
-            //     var token = jwtHandler.ReadJwtToken(jwtToken.Trim('"'));
-
-            //     if (token != null)
-            //     {
-            //         context.User = new ClaimsPrincipal(new ClaimsIdentity(token.Claims));
-            //         context.Items["User"] = new ClaimsPrincipal(new ClaimsIdentity(token.Claims));
-            //     }
-            // }
+                    if (token != null)
+                    {
+                        context.User = new ClaimsPrincipal(new ClaimsIdentity(token.Claims));
+                    }
+                }
+            }
         }
         // Call the next middleware in the pipeline
         await next(context);

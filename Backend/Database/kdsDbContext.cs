@@ -6,7 +6,7 @@ public class kdsDbContext : DbContext
     private readonly IConfiguration _config;
 
     public DbSet<User> Users { get; set; }
-    public DbSet<Friendship> Friends { get; set; }
+    public DbSet<Friendship> Friendships { get; set; }
 
     public DbSet<StationGroup> StationGroups { get; set; }
     public DbSet<Category> Categories { get; set; }
@@ -18,7 +18,7 @@ public class kdsDbContext : DbContext
         : base(options)
     {
         Users = Set<User>();
-        Friends = Set<Friendship>();
+        Friendships = Set<Friendship>();
         _config = config;
     }
 

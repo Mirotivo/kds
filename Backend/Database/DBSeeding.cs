@@ -175,3 +175,92 @@ public class ProductSeeder
         }
     }
 }
+
+
+public class UserSeeder
+{
+    public static void Seed(kdsDbContext context)
+    {
+        if (!context.Users.Any())
+        {
+            var amr = new User
+            {
+                Email = "Amr.Mostafa@live.com",
+                // Password = "123456",
+                PasswordHash = "AQAAAAIAAYagAAAAELHjO0Ma6EpZO1UcrJ0FEJu4iXQk3jBFFn8c1p0m0r0UatkNq7uUj0B//Hn/gj/drQ==",
+            };
+            var body = new User
+            {
+                Email = "Abdelrahman.Tarek@live.com",
+                // Password = "123456",
+                PasswordHash = "AQAAAAIAAYagAAAAELHjO0Ma6EpZO1UcrJ0FEJu4iXQk3jBFFn8c1p0m0r0UatkNq7uUj0B//Hn/gj/drQ==",
+            };
+            var amir = new User
+            {
+                Email = "Amir.Salah@live.com",
+                // Password = "123456",
+                PasswordHash = "AQAAAAIAAYagAAAAELHjO0Ma6EpZO1UcrJ0FEJu4iXQk3jBFFn8c1p0m0r0UatkNq7uUj0B//Hn/gj/drQ==",
+            };
+            var mostafa = new User
+            {
+                Email = "Mostafa.Salah@live.com",
+                // Password = "123456",
+                PasswordHash = "AQAAAAIAAYagAAAAELHjO0Ma6EpZO1UcrJ0FEJu4iXQk3jBFFn8c1p0m0r0UatkNq7uUj0B//Hn/gj/drQ==",
+            };
+
+            context.Users.AddRange(amr, body, amir, mostafa);
+            context.SaveChanges();
+        }
+    }
+}
+
+public class FriendshipSeeder
+{
+    public static void Seed(kdsDbContext context)
+    {
+        if (!context.Friendships.Any())
+        {
+            var friendships = new List<Friendship>
+            {
+                new Friendship
+                {
+                    UserId = context.Users.FirstOrDefault(c => c.Email == "Amr.Mostafa@live.com")?.Id ?? 0,
+                    FriendId = context.Users.FirstOrDefault(c => c.Email == "Amir.Salah@live.com")?.Id ?? 0,
+                },
+                new Friendship
+                {
+                    UserId = context.Users.FirstOrDefault(c => c.Email == "Amir.Salah@live.com")?.Id ?? 0,
+                    FriendId = context.Users.FirstOrDefault(c => c.Email == "Amr.Mostafa@live.com")?.Id ?? 0,
+                },
+
+                new Friendship
+                {
+                    UserId = context.Users.FirstOrDefault(c => c.Email == "Amr.Mostafa@live.com")?.Id ?? 0,
+                    FriendId = context.Users.FirstOrDefault(c => c.Email == "Abdelrahman.Tarek@live.com")?.Id ?? 0,
+                },
+                new Friendship
+                {
+                    UserId = context.Users.FirstOrDefault(c => c.Email == "Abdelrahman.Tarek@live.com")?.Id ?? 0,
+                    FriendId = context.Users.FirstOrDefault(c => c.Email == "Amr.Mostafa@live.com")?.Id ?? 0,
+                },
+
+                
+                new Friendship
+                {
+                    UserId = context.Users.FirstOrDefault(c => c.Email == "Amr.Mostafa@live.com")?.Id ?? 0,
+                    FriendId = context.Users.FirstOrDefault(c => c.Email == "Mostafa.Salah@live.com")?.Id ?? 0,
+                },
+                new Friendship
+                {
+                    UserId = context.Users.FirstOrDefault(c => c.Email == "Mostafa.Salah@live.com")?.Id ?? 0,
+                    FriendId = context.Users.FirstOrDefault(c => c.Email == "Amr.Mostafa@live.com")?.Id ?? 0,
+                },
+            };
+
+            context.Friendships.AddRange(friendships);
+            context.SaveChanges();
+        }
+    }
+}
+
+

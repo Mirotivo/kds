@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
+[MyCustom]
 public class WebRtcHub : Hub
 {
-    private readonly ILogger<UserController> _logger;
+    private readonly ILogger<WebRtcHub> _logger;
     private readonly Dictionary<string, string> _users;
 
-    public WebRtcHub(ILogger<UserController> logger, Dictionary<string, string> users)
+    public WebRtcHub(ILogger<WebRtcHub> logger, Dictionary<string, string> users)
     {
         _logger = logger;
         _users = users;
@@ -57,13 +58,9 @@ public class WebRtcHub : Hub
 
 
     
-
     
     public async Task Login(string userName)
     {
-        // Add user to the active user list
-        // Clients.All.SendAsync("userLoggedIn", userName);
-
         if (!_users.ContainsKey(userName))
         {
             _users.Add(userName, Context.ConnectionId);
@@ -75,41 +72,23 @@ public class WebRtcHub : Hub
         await Clients.All.SendAsync("userLoggedIn", userName);
     }
 
-    public void Logout(string userName)
+    public async Task Logout(string userName)
     {
-        // Remove user from the active user list
+        _users.Remove(userName);
         Clients.All.SendAsync("userLoggedOut", userName);
     }
 
-    // [MyCustom]
     public override async Task OnConnectedAsync()
     {
-        // Retrieve custom value from the HttpContext
-        // var customValue = Context.GetHttpContext().Items["URL"] as Microsoft.AspNetCore.Http.PathString;
-        // var customValue = (Microsoft.AspNetCore.Http.PathString)Context.GetHttpContext().Items["URL"];
-        // if (customValue.HasValue)
-        // {
-        //     _logger.LogInformation($"URL: {customValue.Value}");
-        // }
-        // // Use custom value in SignalR hub
         _logger.LogInformation($"Connecting : .....");
         try
         {
-            // var userName = Context.User.Identity.Name;
-            // if (userName == null)
-            // {
-            //     userName = (Context.GetHttpContext().Items["User"] as ClaimsPrincipal).Identity.Name;
-            //     _logger.LogInformation($"userName: {userName}");
-            // }
-            // if (userName != null)
-            // {
-            //     var displayName = GetUserDisplayName(userName);
-            //     _users[userName] = displayName;
-            //     await Clients.All.SendAsync("UserConnected", displayName);
-            // }
-            // _users.Add(Context.ConnectionId);
-            // _users.Add(Context.ConnectionId, Context.ConnectionId);
-            // await Clients.All.SendAsync("userLoggedIn", Context.ConnectionId);
+            var userName = Context.User.Identity.Name;
+            userName = GetUserDisplayName(userName);
+            if (userName != null)
+            {
+                await Login(userName);
+            }
         }
         catch (System.Exception)
         {
@@ -122,17 +101,12 @@ public class WebRtcHub : Hub
 
     public override async Task OnDisconnectedAsync(Exception exception)
     {
-        // var userName = Context.User.Identity.Name;
-        // var displayName = GetUserDisplayName(userName);
-        // _users.Remove(userName);
-        // await Clients.All.SendAsync("UserDisconnected", displayName);
-        // await base.OnDisconnectedAsync(exception);
-
+        _logger.LogInformation($"Disconnecting : .....");
         try
         {
-            // ConnectedUsers.Remove(Context.ConnectionId);
-            // _users.Remove(Context.ConnectionId);
-            // await Clients.All.SendAsync("userLoggedOut", Context.ConnectionId);
+            var userName = Context.User.Identity.Name;
+            userName = GetUserDisplayName(userName);
+            await Logout(userName);
         }
         catch (System.Exception)
         {
@@ -140,9 +114,8 @@ public class WebRtcHub : Hub
         }
         finally
         {
-
+            await base.OnDisconnectedAsync(exception);
         }
-        await base.OnDisconnectedAsync(exception);
     }
 
     public async Task GetConnectedUsers()

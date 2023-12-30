@@ -11,12 +11,12 @@ using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using System;
 
+[Route("api/users")]
 [ApiController]
-[Route("[controller]/[action]")]
-public class UserController : ControllerBase
+public class UsersAPIController : ControllerBase
 {
 
-    private readonly ILogger<UserController> _logger;
+    private readonly ILogger<UsersAPIController> _logger;
     private readonly Dictionary<string, string> _users;
     private readonly IHostEnvironment _hostingEnvironment;
 
@@ -24,7 +24,7 @@ public class UserController : ControllerBase
     private readonly IPasswordHasher<User> passwordHasher;
     private readonly IConfiguration _config;
 
-    public UserController(ILogger<UserController> logger,
+    public UsersAPIController(ILogger<UsersAPIController> logger,
         Dictionary<string, string> users, IHostEnvironment hostingEnvironment, kdsDbContext dbContext, IPasswordHasher<User> passwordHasher, IConfiguration config)
     {
         _logger = logger;
@@ -35,7 +35,7 @@ public class UserController : ControllerBase
         _config = config;
     }
 
-    [HttpPost(Name = "register")]
+    [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
         // Check if user already exists
@@ -58,7 +58,7 @@ public class UserController : ControllerBase
     }
 
 
-    [HttpPost(Name = "login")]
+    [HttpPost("login")]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
         var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
@@ -71,22 +71,25 @@ public class UserController : ControllerBase
             {
                 var claims = new[]
                 {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Email),
-                new Claim(ClaimTypes.Email, user.Email)
-            };
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.Email),
+                    new Claim(ClaimTypes.Email, user.Email)
+                };
 
                 var token = new JwtSecurityToken(
                     claims: claims,
                     expires: DateTime.UtcNow.AddDays(7),
                     signingCredentials: new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]??"")),
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "")),
                         SecurityAlgorithms.HmacSha256Signature)
                 );
 
+                var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+                Console.WriteLine("Generated Token: " + tokenString);
+
                 return Ok(new
                 {
-                    token = new JwtSecurityTokenHandler().WriteToken(token)
+                    token = tokenString
                 });
             }
         }

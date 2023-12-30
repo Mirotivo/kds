@@ -1,6 +1,6 @@
 using System;
 
-[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public sealed class MyCustomAttribute : Attribute
 {
     public MyCustomAttribute()

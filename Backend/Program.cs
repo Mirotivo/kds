@@ -57,6 +57,39 @@ builder.Services
                 ValidateIssuer = false,
                 ValidateAudience = false
             };
+            options.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine("Authentication failed: " + context.Exception.Message);
+                        return Task.CompletedTask;
+                    },
+                OnTokenValidated = context =>
+                {
+                    // Token validation succeeded
+                    Console.WriteLine("Token validated: " + context.Principal.Identity.Name);
+                    return Task.CompletedTask;
+                },
+                OnMessageReceived = context =>
+                {
+                    // Invoked when a WebSocket or Long Polling request is received.
+                    Console.WriteLine("Message received: " + context.Token);
+                    return Task.CompletedTask;
+                },
+                OnChallenge = context =>
+                {
+                    // Authentication challenge event
+                    Console.WriteLine("Authentication challenge: " + context.Error);
+                    return Task.CompletedTask;
+                },
+                OnForbidden = context =>
+                {
+                    // Authorization failure event
+                    Console.WriteLine("Authorization failed: " + context);
+                    return Task.CompletedTask;
+                }
+            };
+
         });
 
 
@@ -110,7 +143,7 @@ app.UseCors(options =>
 
 app.UseAuthorization();
 app.UseMiddleware<CustomMiddleware>();
-app.UseAuthentication(); // Add authentication middleware
+// app.UseAuthentication(); // Add authentication middleware
 
 // app.MapControllers();
 // app.MapGet("/", () => "Hello World!");
