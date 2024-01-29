@@ -18,4 +18,6 @@ public class PurchaseOrderDto
     public StationGroupDto StationGroup { get; set; }
     [MapsTo("Notes")]
     public string? Notes { get; set; }
+
+    public string? QRCode { get; set; }
 }

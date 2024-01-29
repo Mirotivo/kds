@@ -19,6 +19,17 @@
     <script>
         connection.start().then(function () {
             // Connection to the hub is established
+            // Check if the "poID" query parameter is present in the URL
+            var urlParams = new URLSearchParams(window.location.search);
+            var poIDParam = urlParams.get("poID");
+            
+            if (poIDParam) {
+                // If "poID" parameter exists, populate it in the input field
+                document.getElementById("poIDInput").value = poIDParam;
+                
+                // Automatically trigger the "Check" button click
+                document.getElementById("subscribeButton").click();
+            }
         });
 
         connection.on("UpdateClient", function (po) {

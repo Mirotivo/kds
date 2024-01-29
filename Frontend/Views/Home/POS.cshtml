@@ -80,6 +80,24 @@
   </div>
 </div>
 
+
+<!-- Add a Bootstrap modal to your HTML -->
+<div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="qrCodeModalLabel">QR Code</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="qrCodeContainer">
+          <!-- QR code will be displayed here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 @section Scripts {
     <script>
       connection.start().then(function () {
@@ -211,6 +229,15 @@
                 connection.invoke("NotifyStations", createdPurchaseOrder).catch(function (err) {
                     console.error(err.toString());
                 });
+
+                // Display the QR code in the modal
+                const qrCodeModal = document.getElementById('qrCodeModal');
+                const qrCodeContainer = document.getElementById('qrCodeContainer');
+                // Set the QR code image source to the base64-encoded QR code received in the response
+                qrCodeContainer.innerHTML = `<img src="data:image/png;base64,${createdPurchaseOrder.qrCode}" alt="QR Code" />`;
+                // Open the modal
+                const bootstrapModal = new bootstrap.Modal(qrCodeModal);
+                bootstrapModal.show();
 
                 // Clear order items and customer name
                 this.orderItems = [];

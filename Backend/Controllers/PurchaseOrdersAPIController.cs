@@ -1,9 +1,14 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using kds.Models;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AutoMapper;
+using ZXing;
+using ZXing.QrCode;
 
 namespace kds.Controllers;
 
@@ -61,6 +66,23 @@ public class PurchaseOrdersAPIController : ControllerBase
         _purchaseOrderService.CreatePurchaseOrder(purchaseOrder);
 
         var createdPurchaseOrderDto = _mapper.Map<PurchaseOrderDto>(purchaseOrder);
+
+        // Generate the QR code image for the URL
+        var barcodeWriter = new ZXing.Windows.Compatibility.BarcodeWriter();
+        barcodeWriter.Format = BarcodeFormat.QR_CODE;
+        barcodeWriter.Options.Width = 200;
+        barcodeWriter.Options.Height = 200;
+        Bitmap qrCodeBitmap = barcodeWriter.Write($"https://localhost:8000/po={purchaseOrder.ID}");
+        // Convert the QR code image to a base64-encoded string
+        string base64Image;
+        using (MemoryStream ms = new MemoryStream())
+        {
+            qrCodeBitmap.Save(ms, ImageFormat.Png);
+            byte[] imageBytes = ms.ToArray();
+            base64Image = Convert.ToBase64String(imageBytes);
+        }
+        createdPurchaseOrderDto.QRCode = base64Image;
+
         return Ok(createdPurchaseOrderDto);
     }
 }
