@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using MediatR;
 using System.Reflection;
+using Prometheus;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -114,6 +115,10 @@ using (var scope = app.Services.CreateScope())
     var dbContext = services.GetRequiredService<kdsDbContext>();
     DbInitializer.Initialize(dbContext);
 }
+
+// Add Prometheus metrics
+app.UseMetricServer(); // Exposes metrics at /metrics endpoint
+app.UseHttpMetrics();  // Measures HTTP request duration and counts
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
